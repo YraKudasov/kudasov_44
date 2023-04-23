@@ -5,7 +5,7 @@
 #pragma warning(disable : 4996)
 #include <iostream>
 #include <locale.h>
-
+#include <stdio.h>
 
 
 const int infinity = 100000;
@@ -52,13 +52,28 @@ void DijkstrasAlgorithm(int countStrings){
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     setlocale(LC_ALL, "Rus");
+    FILE* infile;
+    FILE* outfile;
     int n, m;
-    
+   
+    if (argc < 3) { // Проверяем, переданы ли аргументы
+        printf("Необходимо передать имена входного и выходного файлов в качестве аргументов\n");
+        return 1;
+    }
+
+    infile = fopen(argv[1], "r");
+
+    if (infile==NULL) {
+        printf("Error opening file121212.%s\n", argv[1]);
+        return 1;
+    }
+
     printf("Введите кол-во городов: ");
-    scanf("%d", &n);
+    fscanf(infile, "%d", &n);
+    
 
     for (int i = 1; i <= n; i++) {
         fillArrayWithOneValue(roads[i], n, infinity);
@@ -66,20 +81,21 @@ int main()
 
     printf("Введите стоимость бензина в каждом из городов: ");
     for (int i = 1; i <= n; i++) {
-        scanf("%d", &costOfRoad[i]);
+        fscanf(infile, "%d", &costOfRoad[i]);
     }
 
     printf("Введите кол-во дорог между городами: ");
-    scanf("%d", &m);
+    fscanf(infile, "%d", &m);
 
     printf("Введите список дорог, соединяющих города: ");
     for (int i = 1; i <= m; i++) {
         int a, b;
-        scanf("%d %d", &a, &b);
+        fscanf(infile, "%d %d", &a, &b);
         roads[a][b] = costOfRoad[a];
         roads[b][a] = costOfRoad[b];
     }
-
+    fclose(infile);
+    
     fillArrayWithOneValue(isRoadUsed, n, 0);
 
     fillArrayWithOneValue(minAmountOfRoad, n, infinity);
@@ -90,7 +106,15 @@ int main()
         printf("Минимального пути из 1 в n-ый город не существует\n");
     }
     else {
-        printf("%d\n", minAmountOfRoad[n]);
+
+        outfile = fopen(argv[2], "w"); // открыть файл для записи
+        if (outfile == NULL) { // проверить, открылся ли файл
+            printf("Не удалось открыть файл.%s\n", argv[2]);
+            return 1;
+        }
+
+        fprintf(outfile, "%d", minAmountOfRoad[n]); 
+        fclose(outfile);
     }
 
     return 0;
