@@ -61,9 +61,7 @@ int main()
     scanf("%d", &n);
 
     for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
-            roads[i][j] = infinity;
-        }
+        fillArrayWithOneValue(roads[i], n, infinity);
     }
 
     printf("Введите стоимость бензина в каждом из городов: ");
@@ -74,7 +72,7 @@ int main()
     printf("Введите кол-во дорог между городами: ");
     scanf("%d", &m);
 
-    printf("Введите кол-во дорог между городами: ");
+    printf("Введите список дорог, соединяющих города: ");
     for (int i = 1; i <= m; i++) {
         int a, b;
         scanf("%d %d", &a, &b);
