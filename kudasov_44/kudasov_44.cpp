@@ -57,7 +57,8 @@ int main(int argc, char* argv[])
     setlocale(LC_ALL, "Rus");
     FILE* infile;
     FILE* outfile;
-    int n, m;
+    int num_cities;
+    int num_edges = 0;
    
     if (argc < 3) { // Проверяем, переданы ли аргументы
         printf("Необходимо передать имена входного и выходного файлов в качестве аргументов\n");
@@ -72,37 +73,32 @@ int main(int argc, char* argv[])
     }
 
     printf("Введите кол-во городов: ");
-    fscanf(infile, "%d", &n);
-    
+    fscanf(infile, "%d", &num_cities);
+    int sqr_num_cities = num_cities * num_cities;
 
-    for (int i = 1; i <= n; i++) {
-        fillArrayWithOneValue(roads[i], n, infinity);
+    for (int i = 1; i <= num_cities; i++) {
+        fillArrayWithOneValue(roads[i], num_cities, infinity);
     }
 
-    printf("Введите стоимость бензина в каждом из городов: ");
-    for (int i = 1; i <= n; i++) {
-        fscanf(infile, "%d", &costOfRoad[i]);
+    while (num_edges < sqr_num_cities) {
+        int source, target, weight;
+        if (fscanf(infile, "%d,%d,%d", &source, &target, &weight) != 3) {
+            break;
+        }
+        roads[source][target] = weight;
+        num_edges++;
     }
 
-    printf("Введите кол-во дорог между городами: ");
-    fscanf(infile, "%d", &m);
 
-    printf("Введите список дорог, соединяющих города: ");
-    for (int i = 1; i <= m; i++) {
-        int a, b;
-        fscanf(infile, "%d %d", &a, &b);
-        roads[a][b] = costOfRoad[a];
-        roads[b][a] = costOfRoad[b];
-    }
     fclose(infile);
     
-    fillArrayWithOneValue(isRoadUsed, n, 0);
+    fillArrayWithOneValue(isRoadUsed, num_cities, 0);
 
-    fillArrayWithOneValue(minAmountOfRoad, n, infinity);
+    fillArrayWithOneValue(minAmountOfRoad, num_cities, infinity);
 
-    DijkstrasAlgorithm(n);
+    DijkstrasAlgorithm(num_cities);
 
-    if (minAmountOfRoad[n] == infinity) {
+    if (minAmountOfRoad[num_cities] == infinity) {
         printf("Минимального пути из 1 в n-ый город не существует\n");
     }
     else {
@@ -113,7 +109,7 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        fprintf(outfile, "%d", minAmountOfRoad[n]); 
+        fprintf(outfile, "%d", minAmountOfRoad[num_cities]);
         fclose(outfile);
     }
 
