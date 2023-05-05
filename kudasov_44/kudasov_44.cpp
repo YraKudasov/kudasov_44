@@ -6,17 +6,17 @@
 #include <iostream>
 #include <locale.h>
 #include <stdio.h>
-
+#define MAX_SIZE 100
 
 const int infinity = 100000;
 
-void fillArrayWithOneValue(int array[100], int countStrings, int value){
+void fillArrayWithOneValue(int array[MAX_SIZE], int countStrings, int value){
     for (int z = 1; z <= countStrings; z++) {
         array[z] = value;
     }
 }
 
-int roads[100][100], isRoadUsed[100], minAmountOfRoad[100], costOfRoad[100];
+int roads[MAX_SIZE][MAX_SIZE], isRoadUsed[MAX_SIZE], minAmountOfRoad[MAX_SIZE], costOfRoad[MAX_SIZE];
 
 void RelaxationOfGraphEdge(int i, int j) {
     if (minAmountOfRoad[i] + roads[i][j] < minAmountOfRoad[j]) {
@@ -52,67 +52,86 @@ void DijkstrasAlgorithm(int countStrings){
     }
 }
 
-int main(int argc, char* argv[])
+int readDateFromCsv(char* data[], int roads[MAX_SIZE][MAX_SIZE])
 {
-    setlocale(LC_ALL, "Rus");
-    FILE* infile;
-    FILE* outfile;
     int num_cities;
     int num_edges = 0;
-   
-    if (argc < 3) { // Проверяем, переданы ли аргументы
-        printf("Необходимо передать имена входного и выходного файлов в качестве аргументов\n");
+   FILE* infile = fopen(data[0], "r");
+
+    if (infile == NULL) {
+        printf("Error opening file121212.%s\n", data[0]);
         return 1;
     }
-
-    infile = fopen(argv[1], "r");
-
-    if (infile==NULL) {
-        printf("Error opening file121212.%s\n", argv[1]);
-        return 1;
-    }
-
+    
     printf("Введите кол-во городов: ");
     fscanf(infile, "%d", &num_cities);
-    int sqr_num_cities = num_cities * num_cities;
 
+    int sqr_num_cities = num_cities * num_cities;
+    
     for (int i = 1; i <= num_cities; i++) {
         fillArrayWithOneValue(roads[i], num_cities, infinity);
     }
 
-    while (num_edges < sqr_num_cities) {
+    while (num_edges <= sqr_num_cities) {
         int source, target, weight;
-        if (fscanf(infile, "%d,%d,%d", &source, &target, &weight) != 3) {
+        if (fscanf(infile, "%d;%d;%d", &source, &target, &weight) != 3) {
             break;
         }
-        roads[source][target] = weight;
-        num_edges++;
+        
+        if (roads[source][target] == infinity) {
+            roads[source][target] = weight;
+            num_edges++;
+            
+        }
     }
-
-
     fclose(infile);
-    
-    fillArrayWithOneValue(isRoadUsed, num_cities, 0);
+    return num_cities;
+}
 
-    fillArrayWithOneValue(minAmountOfRoad, num_cities, infinity);
-
-    DijkstrasAlgorithm(num_cities);
-
-    if (minAmountOfRoad[num_cities] == infinity) {
+int writeResultToTxt(char* data[], int minAmountOfRoad[MAX_SIZE], int num_cities)
+    {
+        FILE* outfile;
+        if (minAmountOfRoad[num_cities] == infinity) {
         printf("Минимального пути из 1 в n-ый город не существует\n");
-    }
-    else {
+        }
+        else {
 
-        outfile = fopen(argv[2], "w"); // открыть файл для записи
-        if (outfile == NULL) { // проверить, открылся ли файл
-            printf("Не удалось открыть файл.%s\n", argv[2]);
+        outfile = fopen(data[0], "w");
+        if (outfile == NULL) { 
+            printf("Не удалось открыть файл.%s\n", data[0]);
             return 1;
         }
 
         fprintf(outfile, "%d", minAmountOfRoad[num_cities]);
         fclose(outfile);
+         }
+        return 0;
+}
+
+int main(int argc, char* argv[])
+{
+    setlocale(LC_ALL, "Rus");
+    
+    
+    int count_cities;
+    
+   
+    if (argc < 3) { 
+        printf("Необходимо передать имена входного и выходного файлов в качестве аргументов\n");
+        return 1;
     }
 
+    count_cities = readDateFromCsv(&argv[1], roads);
+    
+    fillArrayWithOneValue(isRoadUsed, count_cities, 0);
+
+    fillArrayWithOneValue(minAmountOfRoad, count_cities, infinity);
+
+    DijkstrasAlgorithm(count_cities);
+
+    int result = writeResultToTxt(&argv[2], minAmountOfRoad, count_cities);
+    
     return 0;
+    
 }
 
