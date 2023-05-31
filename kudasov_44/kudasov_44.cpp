@@ -6,9 +6,46 @@
 #include <iostream>
 #include <locale.h>
 #include <stdio.h>
-#define MAX_SIZE 100
+#include "Header.h"
 
-const int infinity = 100000;
+
+
+int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMassive)
+{
+
+    printf("%d", sizeDataMassive);
+    FILE* infile = fopen(data[0], "r");
+
+    if (infile == NULL) {
+        printf("Error opening file121212.%s\n", data[0]);
+        return 1;
+    }
+
+
+    size_t num_chars_read = 0;
+    char* pos = readDataMassive;
+
+    while (fgets(pos, sizeDataMassive - num_chars_read, infile)) {
+
+        size_t len = strlen(pos);
+        num_chars_read += len;
+        pos += len;
+
+
+        if (num_chars_read == sizeDataMassive - 1) {
+            break;
+        }
+    }
+
+
+    readDataMassive[num_chars_read] = '\0';
+    printf("%s\n", readDataMassive);
+
+    fclose(infile);
+
+    return 0;
+
+}
 
 void fillArrayWithOneValue(int array[MAX_SIZE], int countStrings, int value){
     for (int z = 1; z <= countStrings; z++) {
@@ -52,45 +89,10 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
     }
 }
 
-int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMassive)
-{
-    
-    printf("%d", sizeDataMassive);
-   FILE* infile = fopen(data[0], "r");
 
-    if (infile == NULL) {
-        printf("Error opening file121212.%s\n", data[0]);
-        return 1;
-    }
-
-    
-    size_t num_chars_read = 0;
-    char* pos = readDataMassive;
-
-    while (fgets(pos, sizeDataMassive - num_chars_read, infile)) {
-        
-        size_t len = strlen(pos);
-        num_chars_read += len;
-        pos += len;
-
-        
-        if (num_chars_read == sizeDataMassive - 1) {
-            break;
-        }
-    }
-
-   
-    readDataMassive[num_chars_read] = '\0';
-    printf("%s\n", readDataMassive);
-
-    fclose(infile);
-   
-    return 0;
-    
-}
 
 int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities)
-    {
+ {
         FILE* outfile;
         if (minAmountOfWay[num_cities] == infinity) {
         printf("Минимального пути из 1 в n-ый город не существует\n");
@@ -109,13 +111,18 @@ int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities)
         return 0;
 }
 
-int roads[MAX_SIZE][MAX_SIZE], isRoadUsed[MAX_SIZE], minAmountOfRoad[MAX_SIZE];
+
 
 int main(int argc, char* argv[])
 {
     setlocale(LC_ALL, "Rus");
+
+    int roads[MAX_SIZE][MAX_SIZE], isRoadUsed[MAX_SIZE], minAmountOfRoad[MAX_SIZE];
+
     char inputDataStr[1024];
+
     size_t sizeInputMassive = sizeof(inputDataStr);
+
     int count_cities=0;
 
 
@@ -160,10 +167,10 @@ int main(int argc, char* argv[])
         if (pos == NULL) {
             break;
         }
-        pos++;  // Пропускаем символ '\n'.
+        pos++;  
     }
     
-    
+   
     fillArrayWithOneValue(isRoadUsed, count_cities, 0);
 
     fillArrayWithOneValue(minAmountOfRoad, count_cities, infinity);
