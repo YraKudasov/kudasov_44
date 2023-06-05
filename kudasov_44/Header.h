@@ -33,7 +33,7 @@ void fillArrayWithOneValue(int array[MAX_SIZE], int countStrings, int value);
 \param[in] ways[MAX_SIZE][MAX_SIZE] Матрица смежности
 \param[in/out] minAmountOfWay[MAX_SIZE] Массив минимальных стоимостей маршрутов до каждого города
 */
-void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAmountOfWay[MAX_SIZE]);
+void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAmountOfWay[MAX_SIZE], int shortestPath[MAX_SIZE]);
 
 
 
@@ -45,7 +45,7 @@ void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAm
 \param[in/out] isWayUsed[MAX_SIZE] Массив использованных дорог
 \param[in/out] minAmountOfWay[MAX_SIZE] Массив минимальных стоимостей маршрутов до каждого города
 */
-void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWayUsed[MAX_SIZE], int minAmountOfWay[MAX_SIZE]);
+void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWayUsed[MAX_SIZE], int minAmountOfWay[MAX_SIZE], int shortestPath[MAX_SIZE]);
 
 
 
@@ -57,4 +57,4 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
 \param[in] num_cities Кол-во городов
 \return 0 или 1 в зависимости от результата работы функции (0 - функция отработала успешно, 1 - поймана ошибка)
 */
-int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities);
+int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities, int shortestPath[MAX_SIZE]);

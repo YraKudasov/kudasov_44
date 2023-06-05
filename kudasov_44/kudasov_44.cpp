@@ -17,7 +17,7 @@ int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMas
     FILE* infile = fopen(data[0], "r");
 
     if (infile == NULL) {
-        printf("Error opening file121212.%s\n", data[0]);
+        printf("Error opening reading file.%s\n", data[0]);
         return 1;
     }
 
@@ -55,15 +55,18 @@ void fillArrayWithOneValue(int array[MAX_SIZE], int countStrings, int value){
 
 
 
-void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAmountOfWay[MAX_SIZE]) {
+void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAmountOfWay[MAX_SIZE], int shortestPath[MAX_SIZE]) {
     if (minAmountOfWay[i] + ways[i][j] < minAmountOfWay[j]) {
         minAmountOfWay[j] = minAmountOfWay[i] + ways[i][j];
+        shortestPath[j] = i; // обновляем значение prev[j]
     }
 }
 
-void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWayUsed[MAX_SIZE], int minAmountOfWay[MAX_SIZE]){
+void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWayUsed[MAX_SIZE], int minAmountOfWay[MAX_SIZE], int shortestPath[MAX_SIZE]){
 
     minAmountOfWay[1] = 0;
+
+   
 
     for (int i = 1; i < countStrings; i++) {
         int minAmount = infinity, w = -1;
@@ -83,7 +86,7 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
 
         for (int j = 1; j <= countStrings; j++) {
             if (isWayUsed[j] == 0 && ways[w][j] != infinity) {
-                RelaxationOfGraphEdge(w, j, ways, minAmountOfWay);
+                RelaxationOfGraphEdge(w, j, ways, minAmountOfWay, shortestPath);
             }
         }
     }
@@ -91,24 +94,39 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
 
 
 
-int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities)
- {
-        FILE* outfile;
-        if (minAmountOfWay[num_cities] == infinity) {
+int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities, int shortestPath[MAX_SIZE])
+{
+    FILE* outfile;
+    if (minAmountOfWay[num_cities] == infinity) {
         printf("Минимального пути из 1 в n-ый город не существует\n");
-        }
-        else {
-
+    }
+    else {
         outfile = fopen(data[0], "w");
-        if (outfile == NULL) { 
+
+        if (outfile == NULL) {
             printf("Не удалось открыть файл.%s\n", data[0]);
             return 1;
         }
 
-        fprintf(outfile, "%d", minAmountOfWay[num_cities]);
+        fprintf(outfile, "%d\n", minAmountOfWay[num_cities]);
+
+        // выводим кратчайший путь из вершины 1 в вершину n
+        int path[MAX_SIZE], pathLength = 0;
+        int v = num_cities;
+        while (v != 1) {
+            path[pathLength++] = v;
+            v = shortestPath[v];
+        }
+        path[pathLength++] = 1;
+
+        fprintf(outfile, "Кратчайший путь из города 1 в город %d: ", num_cities);
+        for (int i = pathLength - 1; i >= 0; i--) {
+            fprintf(outfile, "%d ", path[i]);
+        }
         fclose(outfile);
-         }
-        return 0;
+
+    }
+     return 0;
 }
 
 
@@ -125,11 +143,14 @@ int main(int argc, char* argv[])
 
     int count_cities=0;
 
+    int shortestWay[MAX_SIZE] = { 0 }; // массив для хранения предыдущих вершин на пути
 
+    int errorCount = 0;
    
     if (argc < 3) { 
+        
         printf("Необходимо передать имена входного и выходного файлов в качестве аргументов\n");
-        return 1;
+        
     }
 
     int result_input = readDataFromCsv(&argv[1], inputDataStr, sizeInputMassive);
@@ -175,9 +196,9 @@ int main(int argc, char* argv[])
 
     fillArrayWithOneValue(minAmountOfRoad, count_cities, infinity);
 
-    DijkstrasAlgorithm(count_cities, roads, isRoadUsed, minAmountOfRoad);
+    DijkstrasAlgorithm(count_cities, roads, isRoadUsed, minAmountOfRoad, shortestWay);
 
-    int result_output = writeResultToTxt(&argv[2], minAmountOfRoad, count_cities);
+    int result_output = writeResultToTxt(&argv[2], minAmountOfRoad, count_cities, shortestWay);
     
     return 0;
     
