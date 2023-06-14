@@ -12,15 +12,25 @@
 
 int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMassive)
 {
-
-    printf("%d", sizeDataMassive);
-    FILE* infile = fopen(data[0], "r");
-
-    if (infile == NULL) {
-        printf("Error opening reading file.%s\n", data[0]);
+    printf("%с\n", readDataMassive[0]);
+    /* Проверяем корректность входных параметров */
+    if (readDataMassive == NULL || readDataMassive[0]!=0) {
+        printf("Недопустимый входной параметр: массив для считывания данных\n");
         return 1;
     }
 
+    if (sizeDataMassive == 0) {
+        printf("Недопустимый размер данных массива для считывания входных данных\n");
+        return 1;
+    }
+
+    
+    FILE* infile = fopen(data[0], "r");
+
+    if (infile == NULL) {
+        printf("Ошибка открытия файла со входными данными %s\n", data[0]);
+        return 1;
+    }
 
     size_t num_chars_read = 0;
     char* pos = readDataMassive;
@@ -37,9 +47,20 @@ int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMas
         }
     }
 
+    if (num_chars_read == 0 && feof(infile)) {
+        printf("Файл с входными параметрами пуст\n");
+        fclose(infile);
+        return 1;
+    }
 
-    readDataMassive[num_chars_read] = '\0';
-    printf("%s\n", readDataMassive);
+    /* Добавляем нулевой символ в конец массива */
+    if (num_chars_read < sizeDataMassive - 1) {
+        readDataMassive[num_chars_read] = '\0';
+    }
+    else {
+        readDataMassive[sizeDataMassive - 1] = '\0';
+    }
+
 
     fclose(infile);
 
@@ -137,7 +158,7 @@ int main(int argc, char* argv[])
 
     int roads[MAX_SIZE][MAX_SIZE], isRoadUsed[MAX_SIZE], minAmountOfRoad[MAX_SIZE];
 
-    char inputDataStr[1024];
+    char inputDataStr[512]={ 0 };
 
     size_t sizeInputMassive = sizeof(inputDataStr);
 
@@ -149,14 +170,15 @@ int main(int argc, char* argv[])
    
     if (argc < 3) { 
         
-        printf("Необходимо передать имена входного и выходного файлов в качестве аргументов\n");
-        
+        printf("Необходимо передать имена входного или выходного файлов в качестве аргументов\n");
+        return 1;
     }
 
     int result_input = readDataFromCsv(&argv[1], inputDataStr, sizeInputMassive);
-    printf("%s\n", inputDataStr);
     
-  
+    if (result_input == 1){
+        return 1;
+    }
 
     sscanf(inputDataStr, "%d", &count_cities);
     printf("%d", count_cities);
