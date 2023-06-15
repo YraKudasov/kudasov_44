@@ -12,18 +12,21 @@
 
 int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMassive)
 {
-    printf("%с\n", readDataMassive[0]);
-    /* Проверяем корректность входных параметров */
+    
+    if (data == NULL) {
+        printf("Недопустимый файл с входными параметрами\n");
+        return 1;
+    }
     if (readDataMassive == NULL || readDataMassive[0]!=0) {
-        printf("Недопустимый входной параметр: массив для считывания данных\n");
+        printf("Недопустимый массив для считывания данных\n");
         return 1;
     }
-
-    if (sizeDataMassive == 0) {
-        printf("Недопустимый размер данных массива для считывания входных данных\n");
+    int lenn = strlen(data[0]);
+    if (sizeDataMassive == 0 || lenn > sizeDataMassive) {
+        printf("Недопустимый размер массива для считывания входных данных\n");
         return 1;
     }
-
+    
     
     FILE* infile = fopen(data[0], "r");
 
@@ -69,6 +72,15 @@ int readDataFromCsv(char* data[], char readDataMassive[1024], size_t sizeDataMas
 }
 
 void fillArrayWithOneValue(int array[MAX_SIZE], int countStrings, int value){
+    if (countStrings < 1 || countStrings >= MAX_SIZE) {
+        printf("Ошибка: некорректное значение countStrings\n");
+        return;
+    }
+
+    if (array == NULL) {
+        printf("Ошибка: массив не может быть равен NULL\n");
+        return;
+    }
     for (int z = 1; z <= countStrings; z++) {
         array[z] = value;
     }
@@ -158,7 +170,7 @@ int main(int argc, char* argv[])
 
     int roads[MAX_SIZE][MAX_SIZE], isRoadUsed[MAX_SIZE], minAmountOfRoad[MAX_SIZE];
 
-    char inputDataStr[512]={ 0 };
+    char inputDataStr[1024]={ 0 };
 
     size_t sizeInputMassive = sizeof(inputDataStr);
 
@@ -180,10 +192,14 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    sscanf(inputDataStr, "%d", &count_cities);
-    printf("%d", count_cities);
-
-    int sqr_count_cities = count_cities * count_cities;
+    int num_scanned = sscanf(inputDataStr, "%d;;", &count_cities);
+    printf("%d %d\n", num_scanned, count_cities);
+    if (num_scanned == 0 || count_cities < 2) {
+        printf("Не удалось прочитать количество городов\n");
+        return 1; // возвращаем код ошибки
+    }
+    
+    int max_num_edges = count_cities * (count_cities-1);
 
     for (int i = 1; i <= count_cities; i++) {
         fillArrayWithOneValue(roads[i], count_cities, infinity);
@@ -192,21 +208,45 @@ int main(int argc, char* argv[])
     int count_edges = 0;
     char* pos = inputDataStr;
     pos = strchr(pos, '\n');
-   
+    pos++;
 
-    while (count_edges < sqr_count_cities) {
+    while (count_edges < max_num_edges) {
         int source=0, target=0, weight=0;
         if (sscanf(pos, "%d;%d;%d", &source, &target, &weight) != 3) {
+            if (sscanf(pos, "%d;%d;%d", &source, &target, &weight) > 0 && sscanf(pos, "%d;%d;%d", &source, &target, &weight) < 3)
+            {
+                printf("Один или несколько параметров имеют некорректные значения в строке %d\n", count_edges + 2);
+                return 1; // возвращаем код ошибки
+            }
             break;
         }
 
         printf("%d,%d,%d\n", source, target, weight);
-        if (roads[source][target] == infinity) {
+
+        if (weight<1) {
+            printf("Стоимость бензина имеет недопустимо малое значение %d в строке %d\n", weight, count_edges+2);
+            return 1; // возвращаем код ошибки
+        }
+
+        if (source < 0 || source > count_cities || target < 0 || target > count_cities) {
+            printf("Индекс начального %d или конечного города %d имеют неодопустимые значения в строке %d\n",source, target, count_edges + 2);
+            return 1; // возвращаем код ошибки
+        }
+
+        if (source==target) {
+            printf("Индекс начального %d или конечного города %d совпадают в строке %d\n", source, target, count_edges + 2);
+            return 1; // возвращаем код ошибки
+        }
+
+        if (roads[source][target] != infinity) {
+            printf("Из города %d в город %d больше одной дороги в строке %d\n", source, target, count_edges + 2);
+            return 1; // возвращаем код ошибки
+        }
+
             roads[source][target] = weight;
             count_edges++;
-        }
-        pos = strchr(pos, '\n');
         
+        pos = strchr(pos, '\n');
         if (pos == NULL) {
             break;
         }
