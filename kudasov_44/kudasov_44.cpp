@@ -89,6 +89,21 @@ void fillArrayWithOneValue(int array[MAX_SIZE], int countStrings, int value){
 
 
 void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAmountOfWay[MAX_SIZE], int shortestPath[MAX_SIZE]) {
+    if (i < 1 || i >= MAX_SIZE || j < 1 || j >= MAX_SIZE || i==j) {
+        // обработка некорректных индексов i и j
+        printf("Некорректно заданы индексы городов для релаксации ребра\n");
+        return;
+    }
+    if (minAmountOfWay[i] == infinity || (minAmountOfWay[i] < 1 && i>1)) {
+        // обработка некорректных значений входных параметров
+        printf("Некорректно задан массив минимальных затрат для города %d\n", i);
+        return;
+    }
+    if (ways[i][j] == infinity || ways[i][j] < 1) {
+        // обработка некорректных значений входных параметров
+        printf("Стоимость дороги из города %d в город %d имеет некорректное значение\n", i, j);
+        return;
+    }
     if (minAmountOfWay[i] + ways[i][j] < minAmountOfWay[j]) {
         minAmountOfWay[j] = minAmountOfWay[i] + ways[i][j];
         shortestPath[j] = i; // обновляем значение prev[j]
@@ -97,9 +112,17 @@ void RelaxationOfGraphEdge(int i, int j, int ways[MAX_SIZE][MAX_SIZE], int minAm
 
 void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWayUsed[MAX_SIZE], int minAmountOfWay[MAX_SIZE], int shortestPath[MAX_SIZE]){
 
-    minAmountOfWay[1] = 0;
+    if (countStrings > MAX_SIZE || countStrings<2) {
+        printf("Ошибка: количество городов имеет некорректное значение");
+        return;
+    }
 
-   
+    if (!ways || !isWayUsed || !minAmountOfWay || !shortestPath) {
+        printf("Ошибка: один или несколько входных массивов являются нулевыми указателями");
+        return;
+    }
+
+    minAmountOfWay[1] = 0;
 
     for (int i = 1; i < countStrings; i++) {
         int minAmount = infinity, w = -1;
@@ -111,7 +134,6 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
         }
 
         if (w < 0) {
-            printf("Минимального пути из 1 в n-ый город не существует");
             break;
         }
 
