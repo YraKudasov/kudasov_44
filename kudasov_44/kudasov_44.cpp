@@ -203,16 +203,17 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
 
 
 
-int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities, int shortestPath[MAX_SIZE])
+int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities, const int shortestPath[MAX_SIZE])
 {
-    FILE* outfile;
-
     /* Если не существует пути из первого города в n-ый город, выводим сообщение об ошибке */
     if (minAmountOfWay[num_cities] == infinity) {
         printf("Минимального пути из 1 в n-ый город не существует\n");
         return 1;
     }
     else {
+       
+        FILE* outfile;
+
         /* Открываем файл для записи */
         outfile = fopen(data[0], "w");
 
@@ -266,7 +267,7 @@ int main(int argc, char* argv[])
     int count_cities=0;
 
     /*  Массив для хранения предыдущих вершин на пути */
-    int shortestWay[MAX_SIZE] = { 0 }; 
+     int shortestWay[MAX_SIZE] = { 0 }; 
    
     /* Проверяем, что переданы имена входного и выходного файлов */
     if (argc < 3) { 
@@ -276,9 +277,11 @@ int main(int argc, char* argv[])
     }
 
     /* Считываем данные из входного файла в строку inputDataStr. */
+    
     int result_input = readDataFromCsv(&argv[1], inputDataStr, sizeInputMassive);
     
     if (result_input == 1){
+        printf("Не удалось прочитать данные из входного файла\n");
         return 1;
     }
 
@@ -286,7 +289,7 @@ int main(int argc, char* argv[])
     int num_scanned = sscanf(inputDataStr, "%d;;", &count_cities);
 
     /* Проверяем, что количество городов прочитано корректно. */
-    if (num_scanned == 0 || count_cities < 2) {
+    if (num_scanned == 0 || count_cities < 2 || count_cities >= MAX_SIZE ) {
         printf("Не удалось прочитать количество городов\n");
         return 1; // возвращаем код ошибки
     }

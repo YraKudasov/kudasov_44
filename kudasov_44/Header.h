@@ -59,4 +59,4 @@ void DijkstrasAlgorithm(int countStrings, int ways[MAX_SIZE][MAX_SIZE], int isWa
  *
  * \return 0 или 1 в зависимости от результата работы функции (0 - функция отработала успешно, 1 - поймана ошибка)
  */
-int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities, int shortestPath[MAX_SIZE]);
+int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities, const int shortestPath[MAX_SIZE]);
