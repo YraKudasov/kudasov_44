@@ -215,7 +215,7 @@ int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities,
         FILE* outfile;
 
         /* Открываем файл для записи */
-        outfile = fopen(data[0], "w");
+        outfile = fopen(data[0], "r+");
 
         /* Если не удалось открыть файл, выводим сообщение об ошибке и завершаем функцию */
         if (outfile == NULL) {
@@ -252,6 +252,7 @@ int writeResultToTxt(char* data[], int minAmountOfWay[MAX_SIZE], int num_cities,
 
 int main(int argc, char* argv[])
 {
+ 
     setlocale(LC_ALL, "Rus");
 
     /* Три массива для хранения данных о дорогах, использованных дорогах и минимальном расстоянии от начальной вершины до остальных вершин соответственно */
@@ -367,7 +368,11 @@ int main(int argc, char* argv[])
         return 1;
     }
     /* Если запись в файл прошла успешно, то программа возвращает код успешного завершения 0 */
+
     return 0;
+
+   
+
     
 }
 
